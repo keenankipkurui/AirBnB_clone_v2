@@ -1,35 +1,30 @@
 #!/usr/bin/python3
+""" Hello world in flask"""
+
+
 from flask import Flask
-"""
-intializing flask web app to listen on 0.0.0.0:5000
-"""
+
+
 app = Flask(__name__)
-app.url_map.strict_slashes = False
 
 
-@app.route('/')
+@app.route('/', strict_slashes=False)
 def hello_world():
-    """
-    Display "Hello HBNB!"
-    """
-    return ('Hello HBNB!')
+    """route index"""
+    return 'Hello HBNB!'
 
 
-@app.route('/hbnb')
+@app.route('/hbnb', strict_slashes=False)
 def hbnb():
-    """
-    route /hbnb displays
-    """
-    return ('HBNB')
+    """route HBNB"""
+    return 'HBNB'
 
 
-@app.route('/c/<text>')
-def c(text):
-    """
-    replaces _ with spaces
-    """
-    return ("C {}".format(text.replace('_', ' ')))
+@app.route('/c/<text>', strict_slashes=False)
+def ctext(text):
+    """route C"""
+    return 'C %s' % text.replace('_', ' ')
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

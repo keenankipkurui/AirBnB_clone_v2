@@ -1,51 +1,58 @@
 #!/usr/bin/python3
-from flask import Flask, render_template
-"""
-intializing flask web app to listen on 0.0.0.0:5000
-"""
-from flask import Flask, render_template
-from models import storage, classes
+""" List of states """
+
+
+from flask import Flask
+from flask import session
+from models import storage
+from flask import render_template
+
+
 app = Flask(__name__)
-app.url_map.strict_slashes = False
 
 
-@app.route('/states')
-@app.route('/states_list')
-def states_list():
-    """
-    """
-    states = storage.all(classes["State"]).values()
-    return (render_template('7-states_list.html', states=states))
+@app.route('/states', strict_slashes=False)
+def states():
+    """lists states"""
+    storage.reload()
+    cities = None
+    states_dict = storage.all("State")
+    states = []
+    for k, v in states_dict.items():
+        states.append([v.id, v.name])
+    return render_template('9-states.html', states=states,
+                           cities=cities, id=None)
 
 
-@app.route('/states/<n>')
-def state_id(n):
-    """
-    routes /state/<id> to display state of given id
-    """
-    states = storage.all(classes["State"])
-    state_key = "State.{}".format(n)
-    if state_key in states:
-        state = states[state_key]
-    else:
-        state = None
-    return (render_template('9-states.html', state=state))
-
-
-@app.route('/cities_by_states')
-def cities_by_states():
-    """
-    """
-    states = storage.all(classes["State"]).values()
-    return (render_template('8-cities_by_states.html', states=states))
+@app.route('/states/<id>', strict_slashes=False)
+def states_id(id):
+    """lists states"""
+    storage.reload()
+    cities_dict = storage.all("City")
+    states_dict = storage.all("State")
+    cities_states = []
+    states = []
+    state = []
+    for k, v in states_dict.items():
+        states.append([v.id, v.name])
+    for city in cities_dict.values():
+        if city.state_id == id:
+            cities_states.append([city.id, city.name])
+    for s in states:
+        if s[0] == id:
+            state.append([s[0], s[1]])
+    if (len(state) != 0):
+        state = state[0][1]
+    if (len(cities_states) != 0 and len(state) != 0):
+        return render_template('9-states.html', states=state,
+                               cities=cities_states, id=id)
+    return render_template('9-states.html', states=None, cities=None, id=0)
 
 
 @app.teardown_appcontext
-def teardown_db(exception):
-    """
-    """
+def teardown_db(error):
+    """lists states"""
     storage.close()
 
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

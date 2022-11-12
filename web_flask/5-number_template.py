@@ -1,60 +1,49 @@
 #!/usr/bin/python3
-from flask import Flask, render_template
-"""
-intializing flask web app to listen on 0.0.0.0:5000
-"""
+""" Hello world in flask"""
+
+
+from flask import Flask
+from flask import render_template
+
 app = Flask(__name__)
-app.url_map.strict_slashes = False
 
 
-@app.route('/')
+@app.route('/', strict_slashes=False)
 def hello_world():
-    """
-    Display "Hello HBNB!"
-    """
-    return ('Hello HBNB!')
+    """route index"""
+    return 'Hello HBNB!'
 
 
-@app.route('/hbnb')
+@app.route('/hbnb', strict_slashes=False)
 def hbnb():
-    """
-    route /hbnb displays
-    """
-    return ('HBNB')
+    """route HBNB"""
+    return 'HBNB'
 
 
-@app.route('/c/<text>')
-def c(text):
-    """
-    replaces _ with spaces
-    """
-    return ("C {}".format(text.replace('_', ' ')))
+@app.route('/c/<text>', strict_slashes=False)
+def ctext(text):
+    """route C"""
+    return 'C %s' % text.replace('_', ' ')
 
 
-@app.route('/python')
-@app.route('/python/<text>')
-def py(text="is cool"):
-    """
-    default adds is cool and replaces _ with space
-    """
-    return("Python {}".format(text.replace('_', ' ')))
+@app.route('/python', defaults={'text': 'is cool'}, strict_slashes=False)
+@app.route('/python/<text>', strict_slashes=False)
+def ctextdefault(text):
+    """route C"""
+    return 'Python %s' % text.replace('_', ' ')
 
 
-@app.route('/number/<int:n>')
-def num(n):
-    """
-    displays only if the added is an int
-    """
-    return ("{:d} is a number".format(n))
+@app.route('/number/<int:n>', strict_slashes=False)
+def number(n):
+    """route number"""
+    return '%d is a number' % n
 
 
-@app.route('/number_template/<int:n>')
-def template(n):
-    """
-    routes /number_templates with n integer
-    """
-    return (render_template('5-number.html', n=n))
+@app.route('/number_template/<int:n>', strict_slashes=False)
+def render_html(n=None):
+    """render template"""
+    if isinstance(n, int):
+        return render_template('5-number.html', n=n)
 
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

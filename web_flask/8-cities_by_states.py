@@ -1,36 +1,39 @@
 #!/usr/bin/python3
-from flask import Flask, render_template
-"""
-intializing flask web app to listen on 0.0.0.0:5000
-"""
-from flask import Flask, render_template
-from models import storage, classes
+""" List of states """
+
+
+from flask import Flask
+from flask import session
+from models import storage
+from flask import render_template
+
+
 app = Flask(__name__)
-app.url_map.strict_slashes = False
 
 
-@app.route('/states_list')
-def states_list():
-    """
-    """
-    states = storage.all(classes["State"]).values()
-    return (render_template('8-cities_by_states.html', states=states))
-
-
-@app.route('/cities_by_states')
-def cities_by_states():
-    """
-    """
-    states = storage.all(classes["State"]).values()
-    return (render_template('8-cities_by_states.html', states=states))
+@app.route('/cities_by_states', strict_slashes=False)
+def cities_ofstate():
+    """cities of a state"""
+    storage.reload()
+    cities_dict = storage.all("City")
+    states_dict = storage.all("State")
+    cities_states = {}
+    states = []
+    for k, v in states_dict.items():
+        states.append([v.id, v.name])
+    for city in cities_dict.values():
+        if city.state_id in cities_states.keys():
+            cities_states[city.state_id].append([city.id, city.name])
+        else:
+            cities_states[city.state_id] = [[city.id, city.name]]
+    return render_template('8-cities_by_states.html', states=states,
+                           cities=cities_states)
 
 
 @app.teardown_appcontext
-def teardown_db(exception):
-    """
-    """
+def teardown_db(error):
+    """lists states"""
     storage.close()
 
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5000)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

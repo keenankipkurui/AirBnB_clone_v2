@@ -1,18 +1,17 @@
 #!/usr/bin/python3
+""" Hello world in flask"""
+
+
 from flask import Flask
-"""
-intializing flask web app to listen on 0.0.0.0:5000
-"""
-application = Flask(__name__)
 
 
-@application.route('/', strict_slashes=False)
+app = Flask(__name__)
+
+
+@app.route('/', strict_slashes=False)
 def hello_world():
-    """
-    Display "Hello HBNB!"
-    """
-    return ('Hello HBNB!')
+    """route index"""
+    return 'Hello HBNB!'
 
-
-if __name__ == "__main__":
-    application.run()
+if __name__ == '__main__':
+    app.run(host='0.0.0.0')

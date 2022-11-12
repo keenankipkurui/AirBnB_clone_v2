@@ -1,37 +1,29 @@
 #!/usr/bin/python3
-'''
-    Implementation of the State class
-'''
-
+"""This is the state class"""
 from models.base_model import BaseModel, Base
-from sqlalchemy import Column, String
-from sqlalchemy.orm import relationship
-from models.city import City
-import os
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String
+from sqlalchemy.orm import relationship, backref
+from os import environ
 import models
 
 
 class State(BaseModel, Base):
-    '''
-        Implementation for the State.
-    '''
+    """This is the class for State
+    Attributes:
+        name: input name
+    """
     __tablename__ = 'states'
-    if os.getenv('HBNB_TYPE_STORAGE') == 'db':
-        name = Column(String(128), nullable=False)
-        cities = relationship("City", passive_deletes=True, backref="state")
+    name = Column(String(128), nullable=False)
+    if 'HBNB_TYPE_STORAGE' in environ and environ['HBNB_TYPE_STORAGE'] == 'db':
+        cities = relationship('City', cascade="all, delete-orphan",
+                              backref="state")
     else:
-        name = ""
-
         @property
         def cities(self):
-            """
-            cities property
-            """
-            city_list = []
-            for key, val in models.storage.all().items():
-                try:
-                    if val.state_id == self.id:
-                        city_list.append(val)
-                except AttributeError:
-                    pass
-            return city_list
+            lis = []
+            stat = self.id
+            for k, v in models.storage.all().items():
+                if "City" in k and v.state_id == self.id:
+                    lis.append(v)
+            return lis
